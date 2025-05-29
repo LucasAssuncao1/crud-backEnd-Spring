@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import com.lucas.service.CourseService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -30,14 +33,25 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Course> search(Long id) {
-        return courseService.search(id);
+    public Course search(@PathVariable Long id) {
+        return courseService.searchById(id);
     }
 
     @PostMapping()
     @ResponseStatus(code = HttpStatus.CREATED)
     public Course create(@RequestBody Course course) {
-        return courseService.save(course);
+        return courseService.create(course);
+    }
+
+    @PutMapping("/{id}")
+    public Course update(@PathVariable Long id, @RequestBody Course course) {
+        return courseService.update(id, course);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        courseService.destroy(id);
     }
 
 }

@@ -16,13 +16,13 @@ public class CrudSpringApplication {
 	}
 
 	@Bean
-	CommandLineRunner init(CourseRepository courseRepository){
+	CommandLineRunner init(CourseRepository courseRepository) {
 		return args -> {
 			courseRepository.deleteAll();
-			
+
 			Course c = new Course();
 			c.setName("Angular com Spring");
-			c.setCategory("Front-end");
+			c.setCategory("front-end");
 
 			courseRepository.save(c);
 		};
