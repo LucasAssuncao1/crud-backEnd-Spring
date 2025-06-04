@@ -2,67 +2,67 @@ package com.lucas.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.lucas.converter.Converter;
 import com.lucas.model.Course;
 import com.lucas.repository.CourseRepository;
+import com.lucas.request.CourseRequest;
+import com.lucas.response.CourseResponse;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class CourseService {
 
+    private final Converter converter;
     private CourseRepository courseRepository;
 
-    public List<Course> list() {
-        return courseRepository.findAll();
+    public List<CourseResponse> list() {
+        return converter.convertList(courseRepository.findAll(), CourseResponse.class);
     }
 
-    public Course searchById(Long id) {
-        return courseRepository.findById(id)
+    public CourseResponse searchById(Long id) {
+        Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404),
                         "Course não encontrado com o id: " + id));
+
+        return converter.convert(course, CourseResponse.class);
     }
 
-    public Course create(Course course) {
+    public CourseResponse create(CourseRequest request) {
         Course newCourse = new Course();
-        newCourse.setName(course.getName());
-        newCourse.setCategory(course.getCategory());
+        newCourse.setName(request.getName());
+        newCourse.setCategory(request.getCategory());
 
-        return courseRepository.save(newCourse);
+        return converter.convert(courseRepository.save(newCourse), CourseResponse.class);
+
     }
 
-    public Course update(Long id, Course course) {
+    public CourseResponse update(Long id, CourseRequest request) {
 
-        Course courseUpdated = this.searchById(id);
+        Course courseUpdated = courseRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404),
+                        "Course não encontrado com o id: " + id));
 
-        courseUpdated.setName(course.getName());
-        courseUpdated.setCategory(course.getCategory());
+        courseUpdated.setName(request.getName());
+        courseUpdated.setCategory(request.getCategory());
 
-        return courseRepository.save(courseUpdated);
+        return converter.convert(courseRepository.save(courseUpdated), CourseResponse.class);
     }
 
     public void destroy(Long id) {
         // Verifica se o curso existe antes de tentar excluí-lo
         // Se não existir, lança uma exceção
-        Course course = this.searchById(id);
-        if (course != null) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isPresent()) {
             courseRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatusCode.valueOf(404), "Course não encontrado com o id: " + id);
         }
     }
-
 }
