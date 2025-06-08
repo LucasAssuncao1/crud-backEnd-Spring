@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lucas.model.Course;
 import com.lucas.request.CourseRequest;
 import com.lucas.response.CourseResponse;
 import com.lucas.service.CourseService;
@@ -54,7 +53,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable @NotNull @Positive Long id) {
         courseService.destroy(id);
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.lucas.converter.Converter;
+import com.lucas.exception.ResourceNotFoundException;
 import com.lucas.model.Course;
 import com.lucas.repository.CourseRepository;
 import com.lucas.request.CourseRequest;
@@ -28,8 +29,7 @@ public class CourseService {
 
     public CourseResponse searchById(Long id) {
         Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404),
-                        "Course não encontrado com o id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
 
         return converter.convert(course, CourseResponse.class);
     }
@@ -46,8 +46,7 @@ public class CourseService {
     public CourseResponse update(Long id, CourseRequest request) {
 
         Course courseUpdated = courseRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404),
-                        "Course não encontrado com o id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
 
         courseUpdated.setName(request.getName());
         courseUpdated.setCategory(request.getCategory());
@@ -57,12 +56,8 @@ public class CourseService {
 
     public void destroy(Long id) {
         // Verifica se o curso existe antes de tentar excluí-lo
-        // Se não existir, lança uma exceção
-        Optional<Course> course = courseRepository.findById(id);
-        if (course.isPresent()) {
-            courseRepository.deleteById(id);
-        } else {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(404), "Course não encontrado com o id: " + id);
-        }
+        // Se não existir, lança uma exceção personalizada
+        courseRepository.delete(courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id)));
     }
 }
