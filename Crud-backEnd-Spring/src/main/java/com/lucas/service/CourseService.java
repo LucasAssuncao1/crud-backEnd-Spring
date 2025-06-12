@@ -1,19 +1,21 @@
 package com.lucas.service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.lucas.converter.Converter;
+import com.lucas.enums.Category;
 import com.lucas.exception.ResourceNotFoundException;
 import com.lucas.model.Course;
 import com.lucas.repository.CourseRepository;
 import com.lucas.request.CourseRequest;
 import com.lucas.response.CourseResponse;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -24,34 +26,37 @@ public class CourseService {
     private CourseRepository courseRepository;
 
     public List<CourseResponse> list() {
-        return converter.convertList(courseRepository.findAll(), CourseResponse.class);
+        List<CourseResponse> courses = courseRepository.findAll()
+                .stream()
+                .map(course -> converter.convertToResponse(course))
+                .collect(Collectors.toList());
+
+        return courses;
     }
 
-    public CourseResponse searchById(Long id) {
+    public CourseResponse searchById(@NotNull @Positive Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
-        return converter.convert(course, CourseResponse.class);
+        return converter.convertToResponse(course);
     }
 
-    public CourseResponse create(CourseRequest request) {
-        Course newCourse = new Course();
-        newCourse.setName(request.getName());
-        newCourse.setCategory(request.getCategory());
+    public CourseResponse create(@Valid @NotNull CourseRequest request) {
+        Course course = converter.convertToEntity(request);
 
-        return converter.convert(courseRepository.save(newCourse), CourseResponse.class);
+        return converter.convertToResponse(courseRepository.save(course));
 
     }
 
-    public CourseResponse update(Long id, CourseRequest request) {
+    public CourseResponse update(@NotNull @Positive Long id, CourseRequest request) {
 
         Course courseUpdated = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
-        courseUpdated.setName(request.getName());
-        courseUpdated.setCategory(request.getCategory());
+        courseUpdated.setName(request.name());
+        courseUpdated.setCategory(converter.convertToCategory(request.category()));
 
-        return converter.convert(courseRepository.save(courseUpdated), CourseResponse.class);
+        return converter.convertToResponse(courseRepository.save(courseUpdated));
     }
 
     public void destroy(Long id) {

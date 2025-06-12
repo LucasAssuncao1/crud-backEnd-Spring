@@ -1,14 +1,27 @@
 package com.lucas.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
 
+import com.lucas.enums.Category;
+import com.lucas.enums.Status;
+import com.lucas.enums.converters.CategoryConverter;
+import com.lucas.enums.converters.StatusConverter;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -29,17 +42,16 @@ public class Course {
     @Column(length = 200, nullable = false)
     private String name;
 
-    @NotBlank
     @NotNull
-    @Length(max = 25)
-    @Pattern(regexp = "Back-end|Front-end")
     @Column(length = 10, nullable = false)
-    private String category;
+    @Convert(converter = CategoryConverter.class)
+    private Category category;
 
-    @NotBlank
     @NotNull
-    @Length(max = 25)
-    @Pattern(regexp = "Ativo|Inativo")
     @Column(length = 10, nullable = false)
-    private String status = "Ativo";
+    @Convert(converter = StatusConverter.class)
+    private Status status = Status.ACTIVE;
+
+    @OneToMany (cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "course" )
+    private List<Lesson> lessons = new ArrayList<>();
 }

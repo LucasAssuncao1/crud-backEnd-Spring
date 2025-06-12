@@ -1,16 +1,13 @@
 package com.lucas.response;
 
-import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
-@Data
-public class CourseResponse {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
-    private Long id;
-
-    private String name;
-
-    private String category;
-
-    private String status;
-
+public record CourseResponse(
+                Long id,
+                @NotBlank @NotNull @Length(min = 3, max = 25) String name,
+                @NotNull @Length(max = 25) @Pattern(regexp = "Back-end|Front-end") String category) {
 }

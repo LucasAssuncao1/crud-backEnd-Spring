@@ -1,11 +1,14 @@
 package com.lucas.request;
 
-import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
-@Data
-public class CourseRequest {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
-    private String name;
-    private String category;
+public record CourseRequest(
+        Long id,
+        @NotBlank @NotNull @Length(min = 3, max = 25) String name,
+        @NotNull @Length(max = 25) @Pattern(regexp = "Back-end|Front-end") String category) {
 
 }

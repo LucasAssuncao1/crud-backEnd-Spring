@@ -8,6 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 
+import com.lucas.enums.Category;
+import com.lucas.model.Course;
+import com.lucas.request.CourseRequest;
+import com.lucas.response.CourseResponse;
+
 /**
  * Utility class for converting between entities and response DTOs using
  * ModelMapper.
@@ -35,6 +40,43 @@ public class Converter {
             return null;
         }
         return modelMapper.map(source, targetClass);
+    }
+
+    public CourseResponse convertToResponse(Course course) {
+        if (course == null) {
+            return null;
+        }
+        CourseResponse courseResponse = new CourseResponse(course.getId(), course.getName(), course.getCategory().getValue());
+        return courseResponse;
+    }
+
+    public Course convertToEntity(CourseRequest request) {
+
+        if (request == null) {
+            return null;
+        }
+
+        Course course = new Course();
+
+        if (request.id() != null) {
+            course.setId(request.id());
+        }
+        course.setName(request.name());
+        course.setCategory(this.convertToCategory(request.category()));
+
+        return course;
+    }
+
+    public Category convertToCategory(String value) {
+        if (value == null) {
+            return null;
+        }
+      return switch (value) {
+        case "Front-end" ->  Category.FRONT_END;
+        case "Back-end" ->   Category.BACK_END ;
+       
+        default -> throw new IllegalArgumentException("Categoria inválida: " + value);
+       };
     }
 
     /**
