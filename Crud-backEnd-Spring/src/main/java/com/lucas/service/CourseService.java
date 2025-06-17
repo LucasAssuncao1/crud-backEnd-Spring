@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.lucas.converter.Converter;
-import com.lucas.enums.Category;
 import com.lucas.exception.ResourceNotFoundException;
 import com.lucas.model.Course;
 import com.lucas.repository.CourseRepository;

@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 
 import com.lucas.enums.Category;
 import com.lucas.model.Course;
+import com.lucas.model.Lesson;
 import com.lucas.request.CourseRequest;
 import com.lucas.response.CourseResponse;
+import com.lucas.response.LessonResponse;
 
 /**
  * Utility class for converting between entities and response DTOs using
@@ -46,8 +48,20 @@ public class Converter {
         if (course == null) {
             return null;
         }
-        CourseResponse courseResponse = new CourseResponse(course.getId(), course.getName(), course.getCategory().getValue());
+
+
+        CourseResponse courseResponse = new CourseResponse(course.getId(), course.getName(), course.getCategory().getValue(),this.convertToLessonResponseList(course.getLessons()));
         return courseResponse;
+    }
+
+    public List<LessonResponse> convertToLessonResponseList(List<Lesson> lessons) {
+       
+      List<LessonResponse>  lessonsResponse = lessons
+                                        .stream()
+                                        .map(lesson -> new LessonResponse(lesson.getId(), lesson.getName(), lesson.getYoutubeUrl()))
+                                        .collect(Collectors.toList());
+        return lessonsResponse;
+                                            
     }
 
     public Course convertToEntity(CourseRequest request) {
