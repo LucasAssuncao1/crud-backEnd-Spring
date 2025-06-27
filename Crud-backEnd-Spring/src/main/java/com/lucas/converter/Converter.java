@@ -49,19 +49,19 @@ public class Converter {
             return null;
         }
 
-
-        CourseResponse courseResponse = new CourseResponse(course.getId(), course.getName(), course.getCategory().getValue(),this.convertToLessonResponseList(course.getLessons()));
+        CourseResponse courseResponse = new CourseResponse(course.getId(), course.getName(),
+                course.getCategory().getValue(), this.convertToLessonResponseList(course.getLessons()));
         return courseResponse;
     }
 
     public List<LessonResponse> convertToLessonResponseList(List<Lesson> lessons) {
-       
-      List<LessonResponse>  lessonsResponse = lessons
-                                        .stream()
-                                        .map(lesson -> new LessonResponse(lesson.getId(), lesson.getName(), lesson.getYoutubeUrl()))
-                                        .collect(Collectors.toList());
+
+        List<LessonResponse> lessonsResponse = lessons
+                .stream()
+                .map(lesson -> new LessonResponse(lesson.getId(), lesson.getName(), lesson.getYoutubeUrl()))
+                .collect(Collectors.toList());
         return lessonsResponse;
-                                            
+
     }
 
     public Course convertToEntity(CourseRequest request) {
@@ -77,6 +77,16 @@ public class Converter {
         }
         course.setName(request.name());
         course.setCategory(this.convertToCategory(request.category()));
+        List<Lesson> lessons = request.lessons().stream().map(lessonRequest -> {
+            Lesson lesson = new Lesson();
+            lesson.setId(lessonRequest.id());
+            lesson.setName(lessonRequest.name());
+            lesson.setYoutubeUrl(lessonRequest.youtubeUrl());
+            lesson.setCourse(course);
+            return lesson;
+        }).collect(Collectors.toList());
+        
+        course.setLessons(lessons);
 
         return course;
     }
@@ -85,12 +95,12 @@ public class Converter {
         if (value == null) {
             return null;
         }
-      return switch (value) {
-        case "Front-end" ->  Category.FRONT_END;
-        case "Back-end" ->   Category.BACK_END ;
-       
-        default -> throw new IllegalArgumentException("Categoria inválida: " + value);
-       };
+        return switch (value) {
+            case "Front-end" -> Category.FRONT_END;
+            case "Back-end" -> Category.BACK_END;
+
+            default -> throw new IllegalArgumentException("Categoria inválida: " + value);
+        };
     }
 
     /**

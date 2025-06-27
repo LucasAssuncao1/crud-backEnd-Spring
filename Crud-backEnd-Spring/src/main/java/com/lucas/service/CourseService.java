@@ -52,6 +52,10 @@ public class CourseService {
         Course courseUpdated = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
 
+        Course course = converter.convertToEntity(request);
+
+        courseUpdated.getLessons().clear();
+        course.getLessons().forEach(lesson ->   courseUpdated.getLessons().add(lesson));
         courseUpdated.setName(request.name());
         courseUpdated.setCategory(converter.convertToCategory(request.category()));
 
@@ -62,6 +66,6 @@ public class CourseService {
         // Verifica se o curso existe antes de tentar excluí-lo
         // Se não existir, lança uma exceção personalizada
         courseRepository.delete(courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id)));
+                .orElseThrow(() -> new ResourceNotFoundException(id))); 
     }
 }
