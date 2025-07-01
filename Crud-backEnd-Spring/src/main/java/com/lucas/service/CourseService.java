@@ -3,6 +3,7 @@ package com.lucas.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lucas.converter.Converter;
@@ -15,13 +16,14 @@ import com.lucas.response.CourseResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class CourseService {
 
-    private final Converter converter;
+    @Autowired
+    private  Converter converter;
+
+    @Autowired
     private CourseRepository courseRepository;
 
     public List<CourseResponse> list() {
@@ -47,7 +49,7 @@ public class CourseService {
 
     }
 
-    public CourseResponse update(@NotNull @Positive Long id, CourseRequest request) {
+    public CourseResponse update(@Valid @NotNull @Positive Long id, CourseRequest request) {
 
         Course courseUpdated = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));

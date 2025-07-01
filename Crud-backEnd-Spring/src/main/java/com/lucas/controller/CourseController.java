@@ -2,6 +2,7 @@ package com.lucas.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,15 +22,18 @@ import com.lucas.service.CourseService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 
 @Validated
 @RestController
 @RequestMapping("/api/courses")
-@AllArgsConstructor
 public class CourseController {
 
-    private final CourseService courseService;
+    @Autowired
+    private  CourseService courseService;
+
+    // public CourseController(CourseService courseService) {
+    //     this.courseService = courseService;
+    // }
 
     @GetMapping
     public List<CourseResponse> list() {
@@ -48,7 +52,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public CourseResponse update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid CourseRequest request) {
+    public CourseResponse update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid @NotNull CourseRequest request) {
         return courseService.update(id, request);
     }
 
@@ -57,5 +61,7 @@ public class CourseController {
     public void delete(@PathVariable @NotNull @Positive Long id) {
         courseService.destroy(id);
     }
+     
+    
 
 }

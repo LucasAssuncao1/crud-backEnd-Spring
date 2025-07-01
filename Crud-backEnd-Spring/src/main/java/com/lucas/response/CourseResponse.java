@@ -12,5 +12,5 @@ public record CourseResponse(
                 Long id,
                 @NotBlank @NotNull @Length(min = 3, max = 25) String name,
                 @NotNull @Length(max = 25) @Pattern(regexp = "Back-end|Front-end") String category,
-                List<LessonResponse> lessons) {
+                @NotNull @NotBlank List<LessonResponse> lessons) {
 }
