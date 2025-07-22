@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.lucas.converter.Converter;
@@ -11,6 +14,7 @@ import com.lucas.exception.ResourceNotFoundException;
 import com.lucas.model.Course;
 import com.lucas.repository.CourseRepository;
 import com.lucas.request.CourseRequest;
+import com.lucas.response.CoursePageResponse;
 import com.lucas.response.CourseResponse;
 
 import jakarta.validation.Valid;
@@ -26,13 +30,15 @@ public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
 
-    public List<CourseResponse> list() {
-        List<CourseResponse> courses = courseRepository.findAll()
+    public CoursePageResponse list(Pageable paginacao) {
+        Page<Course> coursesPage = courseRepository.findAll(paginacao);
+
+        List<CourseResponse> courseResponses = coursesPage.getContent()
                 .stream()
-                .map(course -> converter.convertToResponse(course))
+                .map(converter::convertToResponse)
                 .collect(Collectors.toList());
 
-        return courses;
+        return new CoursePageResponse(courseResponses, coursesPage.getTotalPages(), coursesPage.getTotalElements());
     }
 
     public CourseResponse searchById(@NotNull @Positive Long id) {
