@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import com.lucas.enums.Category;
 import com.lucas.model.Course;
@@ -18,11 +19,12 @@ public class CrudSpringApplication {
 	}
 
 	@Bean
+	@Profile("dev")
 	CommandLineRunner init(CourseRepository courseRepository) {
 		return args -> {
 			courseRepository.deleteAll();
 
-			for(int i =0; i<20 ; i++) {
+			for(int i =0; i<5 ; i++) {
 
 				
 					Course course = new Course();
